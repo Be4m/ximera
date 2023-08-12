@@ -1,7 +1,10 @@
 pub mod colours {
 
-    pub static WHITE: (f32, f32, f32) = (1.0, 1.0, 1.0);
-    pub static BLACK: (f32, f32, f32) = (0.0, 0.0, 0.0);
+    use crate::renderer::utils::types::F32x3;
+
+    pub static WHITE: F32x3 = (1.0, 1.0, 1.0);
+    pub static GREY:  F32x3 = (0.7, 0.7, 0.7);
+    pub static BLACK: F32x3 = (0.0, 0.0, 0.0);
 }
 
 /// Keeps track of data such as camera and object position.
