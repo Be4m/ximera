@@ -4,8 +4,12 @@ use winit::{
     event_loop::ControlFlow,
 };
 
-use crate::renderer::Renderer;
-use crate::renderer::scene::{Scene, ExampleScene, SceneLoader};
+use crate::scene::Scene;
+
+use super::{
+    AssetLoaderModule, InputModule,
+    errors::AppInitError,
+};
 
 type EventLoop = winit::event_loop::EventLoop<()>;
 
@@ -15,16 +19,16 @@ type EventLoop = winit::event_loop::EventLoop<()>;
 /// 
 /// # Design
 /// All functions in this struct except `run` should return the App struct.
+/// 
+/// TODO: Fix lifetime parameters and hopefuly that horrendous asset_loader_modules declaration.
 pub struct App {
     window: Window,
     event_loop: EventLoop,
 
-    input_modules: Vec<Box<dyn InputModule>>,
+    input_modules: Vec::<Box<dyn InputModule>>,
+    asset_loader_modules: Vec::<Box<dyn AssetLoaderModule<Item = dyn super::Asset>>>,
 
-    // TODO: The option part is going to be removed after we set the app to have
-    // a default renderer and thus a SceneLoader.
-    scene_loader: Option<SceneLoader>,
-    active_scene: Box<dyn Scene>,
+    active_scene: Scene,
 }
 
 impl App {
@@ -36,19 +40,30 @@ impl App {
             event_loop,
             
             input_modules: vec![],
+            asset_loader_modules: vec![],
 
-            scene_loader: None,
-            active_scene: Box::new(ExampleScene::default()),
+            active_scene: Scene::default(), // TODO
         }
+    }
+
+    // TODO: Add debugging messages for loading screen.
+    fn init(&self) -> Result<(), AppInitError> {
+
+        // self.geometry_compiler_modules
+        //     .iter()
+        //     .for_each(|gcm| gcm.compile_all());
+
+        for alm in self.asset_loader_modules.iter() {
+            alm.load_all()?;
+        }
+
+        Ok(())
     }
 
     pub fn run(self) {
 
-        // -- CHECKS --
-        // TODO: There should be a default scene loader.
-        let _scene_loader = self.scene_loader.expect("The scene loader is not initialised!
-            Please initialise the scene loader by calling init_scene_loader on the App object.");
-
+        // -- Init --
+        self.init().unwrap();
 
         self.event_loop.run(move |event, _, control_flow| match event {
 
@@ -84,8 +99,8 @@ impl App {
 
             Event::RedrawRequested(window_id) if self.window.id() == window_id => {
 
-                // scene_loader.update(&self.active_scene);
-                // scene_loader.render(&self.active_scene);
+                // self.active_scene.update(); // 
+                // self.renderer.queue_render(&mut queue)
             },
 
             Event::MainEventsCleared => self.window.request_redraw(),
@@ -102,26 +117,11 @@ impl App {
         return self;
     }
 
-    // TODO: As the app expands we might want to have separate renderers for each scene,
-    // that's why this design should in future be replaced with .load_scene(scene, renderer).
-    pub fn init_scene_loader(mut self, renderer: Renderer) -> App {
-
-        self.scene_loader = Some(SceneLoader::new(renderer));
-
+    pub fn add_asset_loader_module<T>(mut self, asset_loader_mod: T) -> App
+    where
+        T: AssetLoaderModule<Item = dyn super::Asset> + 'static
+    {
+        self.asset_loader_modules.push(Box::new(asset_loader_mod));
         return self;
     }
-
-    // TODO: This will be implemented as the program gets more complicated
-    pub fn add_scene<T: Scene>(mut self, scene: T) -> App {
-        self
-    }
-
-    pub fn load_scene<T: Scene>(mut self, scene: T) -> App {
-        self
-    }
-}
-
-pub trait InputModule {
-
-    fn handle_input(&self, input: &KeyboardInput);
 }

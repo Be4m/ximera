@@ -1,5 +1,9 @@
 pub mod geometry {
-    use crate::geometry::{Geometry, Quad, Triangle};
+
+    use crate::renderer::{
+        quad,
+        Quad, Geometry,
+    };
 
 
     // TODO: Maybe there's a more compact & efficient way to do this.
@@ -13,54 +17,53 @@ pub mod geometry {
                 ( r,  r, -r),
                 ( r, -r, -r),
                 (-r, -r, -r),
-            ]),
+            ], quad::CW),
 
             Quad::new([
                 ( r,  r, -r),
                 ( r,  r,  r),
                 ( r, -r,  r),
                 ( r, -r, -r),
-            ]),
+            ], quad::CW),
 
             Quad::new([
                 ( r,  r,  r),
                 (-r,  r,  r),
                 (-r, -r,  r),
                 ( r, -r,  r),
-            ]),
+            ], quad:: CW),
 
             Quad::new([
                 (-r,  r,  r),
                 (-r,  r, -r),
                 (-r, -r, -r),
                 (-r, -r,  r),
-            ]),
+            ], quad::CW),
 
             Quad::new([
                 (-r,  r, -r),
                 ( r,  r, -r),
                 ( r,  r,  r),
                 (-r,  r,  r),
-            ]),
+            ], quad::CW),
 
             Quad::new([
                 (-r, -r, -r),
                 ( r, -r, -r),
                 ( r, -r,  r),
                 (-r, -r,  r),
-            ]),
+            ], quad::CW),
         ]);
 
         return geometry;
-    }
-
-    #[inline]
-    pub fn empty_triangle() -> Triangle {
-        [(0.0, 0.0, 0.0); 3]
     }
 }
 
 pub mod types {
 
+    #[deprecated]
     pub type F32x3 = (f32, f32, f32);
+
+    pub type Vertex   = F32x3;
+    pub type Triangle = [Vertex; 3];
 }

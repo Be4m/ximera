@@ -1,3 +1,0 @@
-// -- VERTEX SHADER --
-
-// -- FRAGMENT SHADER --

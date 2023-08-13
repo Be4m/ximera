@@ -1,15 +1,16 @@
 /// This module probably will have to be moved somewhere else in the future
 
-use super::utils::types::F32x3;
+use crate::utils::types::F32x3;
 
 
-pub struct Location {
+#[derive(Clone, Copy)]
+pub struct Position {
     x: f32,
     y: f32,
     z: f32,
 }
 
-impl From<F32x3> for Location {
+impl From<F32x3> for Position {
     
     fn from(value: F32x3) -> Self {
 

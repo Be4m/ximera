@@ -1,11 +1,5 @@
-pub mod colours {
+use super::mesh::Mesh;
 
-    use crate::renderer::utils::types::F32x3;
-
-    pub static WHITE: F32x3 = (1.0, 1.0, 1.0);
-    pub static GREY:  F32x3 = (0.7, 0.7, 0.7);
-    pub static BLACK: F32x3 = (0.0, 0.0, 0.0);
-}
 
 /// Keeps track of data such as camera and object position.
 /// 
@@ -16,9 +10,11 @@ pub mod colours {
 /// So distilling all of it down to a brief summary, this struct is responsible for providing and storing data
 /// required for rendering, as well as having helper functions for rendering objects.
 pub struct Renderer {
-    surface: wgpu::Surface,
+    // CORE DATA
     device: wgpu::Device,
     queue: wgpu::Queue,
+    surface: wgpu::Surface,
+
     render_pipeline: wgpu::RenderPipeline,
 }
 
@@ -91,6 +87,15 @@ impl Renderer {
     }
 }
 
+#[deprecated]
+pub trait Renderable {
+
+    fn mesh(&self) -> &Mesh;
+
+    fn location(&self) -> &crate::scene::Position;
+}
+
+#[deprecated]
 pub trait RenderUtil {
 
     fn render(&self) -> Result<(), wgpu::SurfaceError>;
