@@ -7,23 +7,15 @@ use winit::{
 
 use crate::scene::Scene;
 
-use super::input_handler::InputHandler;
+use super::input_handler::{InputHandler, InputHandlerModule, InputType};
 
 type EventLoop = winit::event_loop::EventLoop<()>;
 
-
-/// The app struct encapsulates the whole program and provides a way for the
-/// inner components of the program to share data with each other.
-/// 
-/// # Design
-/// All functions in this struct except `run` should return the App struct.
-/// 
-/// TODO: Fix lifetime parameters and hopefuly that horrendous asset_loader_modules declaration.
 pub struct App {
     window: Window,
     event_loop: EventLoop,
 
-    input_handler: Mutex<InputHandler>,
+    input_handler: Mutex::<InputHandler>,
 
     active_scene: Scene,
 }
@@ -57,7 +49,7 @@ impl App {
 
                     // Input Handling
                     WindowEvent::KeyboardInput { input, .. } => {
-                        input_handler.forward_keyboard_input(input);
+                        input_handler.forward(InputType::KeyboardInput(input));
                     },
 
                     _ => {}
@@ -69,7 +61,7 @@ impl App {
                 } => match event {
 
                     DeviceEvent::MouseMotion { delta } => {
-                        input_handler.forward_mouse_motion(delta);
+                        input_handler.forward(InputType::MouseMotion(delta));
                     },
 
                     DeviceEvent::MouseWheel { delta } => {
@@ -84,19 +76,10 @@ impl App {
         });
     }
 
-    // pub fn add_input_module<T>(mut self, input_mod: T) -> App
-    // where
-    //     T: InputModule + 'static
-    // {
-    //     self.input_modules.push(Box::new(input_mod));
-    //     return self;
-    // }
+    pub fn add_input_handler_module(&mut self, module: Box::<dyn InputHandlerModule + 'static>) {
 
-    // pub fn add_asset_loader_module<T>(mut self, asset_loader_mod: T) -> App
-    // where
-    //     T: AssetLoaderModule<Item = dyn super::Asset> + 'static
-    // {
-    //     self.asset_loader_modules.push(Box::new(asset_loader_mod));
-    //     return self;
-    // }
+        let mut input_handler = self.input_handler.lock().unwrap();
+
+        input_handler.add_module(module);
+    }
 }

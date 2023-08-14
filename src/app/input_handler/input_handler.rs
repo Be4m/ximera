@@ -23,19 +23,25 @@ impl InputHandler {
         }
     }
 
-    pub fn forward_keyboard_input(&mut self, input: &KeyboardInput) {
+    pub fn forward(&mut self, input_type: InputType) {
 
-        for handler in self.keyboard_handlers.iter_mut() {
+        match input_type {
 
-            handler.process_input(InputType::KeyboardInput(input));
-        }
-    }
+            InputType::KeyboardInput(input) => {    
 
-    pub fn forward_mouse_motion(&mut self, delta: &(f64, f64)) {
+                for handler in self.keyboard_handlers.iter_mut() {
+                    handler.process_input(InputType::KeyboardInput(input));
+                }
+            },
 
-        for handler in self.keyboard_handlers.iter_mut() {
+            InputType::MouseMotion(delta) => {
 
-            handler.process_input(InputType::MouseMotion(delta));
+                for handler in self.mouse_handlers.iter_mut() {
+                    handler.process_input(InputType::MouseMotion(delta));
+                }
+            },
+
+            InputType::MouseWheelSpin => {}
         }
     }
 
@@ -48,11 +54,6 @@ impl InputHandler {
                 _ => {}
             }
         }
-    }
-
-    pub fn process_modules(&self) {
-
-
     }
 }
 

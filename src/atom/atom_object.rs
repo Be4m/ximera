@@ -2,20 +2,22 @@ use uid::IdU32;
 
 use super::Atom;
 
+use crate::{render::Mesh, scene::Position};
+
 pub struct AtomObject {
     pub atom: Atom,
 
-    pub uid: IdU32<Self>,
-    pub mesh: crate::render::Mesh,
-    pub position: crate::scene::Position,
+    pub uid: IdU32::<Self>,
+    pub mesh: Mesh,
+    pub position: Position,
 }
 
 impl AtomObject {
 
     pub fn new(
         atom: &Atom,
-        mesh: &crate::render::Mesh,
-        position: &crate::scene::Position,
+        mesh: &Mesh,
+        position: &Position,
     ) -> AtomObject {
 
         Self {
