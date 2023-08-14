@@ -1,6 +1,9 @@
-use super::Quad;
+use super::{
+    Mesh,
+    Quad,
+};
 
-use crate::{utils::types::*, renderer::Mesh};
+use crate::utils::types::*;
 
 /// High level representation of a 3d object, before rendering has to be compiled down
 /// to a Mesh struct.

@@ -1,6 +1,6 @@
 pub mod app;
 
-pub mod renderer;
+pub mod render;
 pub mod scene;
 
 pub mod utils;

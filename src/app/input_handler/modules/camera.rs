@@ -1,10 +1,3 @@
-
-use super::Renderer;
-
-use winit::event::VirtualKeyCode;
-
-use crate::app::InputModule;
-
 #[derive(Clone, Copy)]
 pub struct CameraInputModule {}
 

@@ -1,6 +1,6 @@
 pub mod geometry {
 
-    use crate::renderer::{
+    use crate::render::{
         quad,
         Quad, Geometry,
     };

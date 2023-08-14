@@ -1,8 +1,8 @@
 pub mod atom;
+pub mod atom_object;
 
 // Reexports
-pub use self::atom::Atom;
-pub use self::atom::AtomObject;
-
-// App Modules
-pub mod app_modules;
+pub use self::{
+    atom::Atom,
+    atom_object::AtomObject,
+};

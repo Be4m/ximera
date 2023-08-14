@@ -1,10 +1,5 @@
-pub trait Object {
+use crate::atom::AtomObject;
 
-    fn mesh(&self) -> &crate::renderer::Mesh;
-
-    fn position(&self) -> &crate::scene::Position;
-
-    fn update(&mut self) {}
-
-    fn destroy(&mut self) {}
+pub enum Object {
+    Atom(AtomObject),    
 }

@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 bytemuck = { version = "1.13.1", features = ["derive"] }
 itertools = "0.11.0"
+uid = "0.1.7"
 wgpu = "0.16.2"
 winit = "0.28.6"
 

@@ -1,15 +1,13 @@
+use std::sync::Mutex;
+
 use winit::{
     window::Window,
     event::*,
-    event_loop::ControlFlow,
 };
 
 use crate::scene::Scene;
 
-use super::{
-    AssetLoaderModule, InputModule,
-    errors::AppInitError,
-};
+use super::input_handler::InputHandler;
 
 type EventLoop = winit::event_loop::EventLoop<()>;
 
@@ -25,103 +23,80 @@ pub struct App {
     window: Window,
     event_loop: EventLoop,
 
-    input_modules: Vec::<Box<dyn InputModule>>,
-    asset_loader_modules: Vec::<Box<dyn AssetLoaderModule<Item = dyn super::Asset>>>,
+    input_handler: Mutex<InputHandler>,
 
     active_scene: Scene,
 }
 
 impl App {
 
-    pub fn new(window: Window, event_loop: EventLoop) -> App {
+    pub fn new(window: Window, event_loop: EventLoop) -> Self {
 
         Self {
             window,
             event_loop,
             
-            input_modules: vec![],
-            asset_loader_modules: vec![],
+            input_handler: Mutex::new(InputHandler::new()),
 
-            active_scene: Scene::default(), // TODO
+            active_scene: Scene::default(),
         }
-    }
-
-    // TODO: Add debugging messages for loading screen.
-    fn init(&self) -> Result<(), AppInitError> {
-
-        // self.geometry_compiler_modules
-        //     .iter()
-        //     .for_each(|gcm| gcm.compile_all());
-
-        for alm in self.asset_loader_modules.iter() {
-            alm.load_all()?;
-        }
-
-        Ok(())
     }
 
     pub fn run(self) {
 
-        // -- Init --
-        self.init().unwrap();
+        self.event_loop.run(move |event, _, control_flow| {
 
-        self.event_loop.run(move |event, _, control_flow| match event {
+            let mut input_handler = self.input_handler.lock().unwrap();
 
-            Event::WindowEvent {
-                window_id,
-                ref event,
-            } if self.window.id() == window_id => match event {
+            match event {
 
-                // --- Default events ---
+                Event::WindowEvent {
+                    window_id,
+                    ref event,
+                } if self.window.id() == window_id => match event {
 
-                // Close the Window
-                WindowEvent::CloseRequested
-                | WindowEvent::KeyboardInput {
-                    input:
-                        KeyboardInput {
-                            state: ElementState::Pressed,
-                            virtual_keycode: Some(VirtualKeyCode::Escape),
-                            ..
-                        },
+                    // Input Handling
+                    WindowEvent::KeyboardInput { input, .. } => {
+                        input_handler.forward_keyboard_input(input);
+                    },
+
+                    _ => {}
+                },
+
+                Event::DeviceEvent {
+                    ref event,
                     ..
-                } => *control_flow = ControlFlow::Exit,
+                } => match event {
 
-                // --- Handle custom input modules ---
-                WindowEvent::KeyboardInput { input, .. } => {
+                    DeviceEvent::MouseMotion { delta } => {
+                        input_handler.forward_mouse_motion(delta);
+                    },
 
-                    self.input_modules
-                        .iter()
-                        .for_each(|m| m.handle_input(input));
+                    DeviceEvent::MouseWheel { delta } => {
+                        // input_handler.forward_mouse_wheel()
+                    },
+
+                    _ => {}
                 },
 
                 _ => {}
-            },
-
-            Event::RedrawRequested(window_id) if self.window.id() == window_id => {
-
-                // self.active_scene.update(); // 
-                // self.renderer.queue_render(&mut queue)
-            },
-
-            Event::MainEventsCleared => self.window.request_redraw(),
-
-            _ => {}
+            }
         });
     }
 
-    pub fn add_input_module<T>(mut self, input_mod: T) -> App
-    where
-        T: InputModule + 'static
-    {
-        self.input_modules.push(Box::new(input_mod));
-        return self;
-    }
+    // pub fn add_input_module<T>(mut self, input_mod: T) -> App
+    // where
+    //     T: InputModule + 'static
+    // {
+    //     self.input_modules.push(Box::new(input_mod));
+    //     return self;
+    // }
 
-    pub fn add_asset_loader_module<T>(mut self, asset_loader_mod: T) -> App
-    where
-        T: AssetLoaderModule<Item = dyn super::Asset> + 'static
-    {
-        self.asset_loader_modules.push(Box::new(asset_loader_mod));
-        return self;
-    }
+    // pub fn add_asset_loader_module<T>(mut self, asset_loader_mod: T) -> App
+    // where
+    //     T: AssetLoaderModule<Item = dyn super::Asset> + 'static
+    // {
+    //     self.asset_loader_modules.push(Box::new(asset_loader_mod));
+    //     return self;
+    // }
 }

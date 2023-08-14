@@ -3,12 +3,8 @@ use tokio::runtime::Builder;
 use winit::event_loop::EventLoop;
 
 use ximera::{
-    renderer::Renderer,
-    atom::Atom,
-    app::{
-        App,
-        AssetManager,
-    }
+    render::Renderer,
+    app::App,
 };
 
 fn main() {
@@ -29,16 +25,11 @@ fn main() {
 
     let mut rendr = Renderer::new(&window, &tokio_runtime);
 
-    let mut periodic_table = AssetManager::<Atom>::new();
-
-    use ximera::atom::app_modules::PeriodicTableALM;
-
     // Here we're going to load everything that we're going to use for the app.
     // Then things like scenes can be switched, modules deactivated.
     App::new(window, event_loop)
-        .add_asset_loader_module(PeriodicTableALM::new(&mut periodic_table))
-        .add_input_module(CameraIM::new(&mut rendr))
-        .init_scene_loader(rendr)
+        //.add_input_handler_module(MovementIHM::new(&mut rendr.camera))
+        //.add_input_handler_module(CameraIHM::new(&mut rendr.camera))
         .run();
 
     // app.add_module(Module::INPUT_MODULE, renderer::CameraIM);

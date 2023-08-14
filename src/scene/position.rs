@@ -3,11 +3,23 @@
 use crate::utils::types::F32x3;
 
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct Position {
     x: f32,
     y: f32,
     z: f32,
+}
+
+impl Position {
+
+    pub fn mut_up(&self, scalar: f32) -> Self {
+
+        Self {
+            x: self.x,
+            y: self.y + scalar,
+            z: self.z,
+        }
+    }
 }
 
 impl From<F32x3> for Position {

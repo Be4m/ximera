@@ -1,29 +1,17 @@
 use super::mesh::Mesh;
 
-
-/// Keeps track of data such as camera and object position.
-/// 
-/// Encapsulates all data required for rendering, for example: gpu info.
-/// As well as, as mentioned above, probably will be responsible for recording object position in
-/// visual space, or now I'm thinking maybe we'll do that in a world struct or something like that.
-/// 
-/// So distilling all of it down to a brief summary, this struct is responsible for providing and storing data
-/// required for rendering, as well as having helper functions for rendering objects.
 pub struct Renderer {
-    // CORE DATA
     device: wgpu::Device,
     queue: wgpu::Queue,
     surface: wgpu::Surface,
 
     render_pipeline: wgpu::RenderPipeline,
+
+    //camera: Camera,
 }
 
 impl Renderer {
 
-    //! Creates a renderer object with default parameters.
-    //! 
-    //! # Unfinished
-    //! - [ ] Error handling
     pub fn new(
         window: &winit::window::Window,
         runtime: &tokio::runtime::Runtime,
@@ -87,16 +75,13 @@ impl Renderer {
     }
 }
 
-#[deprecated]
+
+// DEV: Although I am now on a quest to eliminate as many trait objects from this program
+// as possible, I think it's worth leaving a note here that a Renderable trait does make sence to me,
+// especially now that Object is an enum.
 pub trait Renderable {
 
     fn mesh(&self) -> &Mesh;
 
-    fn location(&self) -> &crate::scene::Position;
-}
-
-#[deprecated]
-pub trait RenderUtil {
-
-    fn render(&self) -> Result<(), wgpu::SurfaceError>;
+    fn position(&self) -> &crate::scene::Position;
 }
