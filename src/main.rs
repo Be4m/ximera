@@ -7,7 +7,7 @@ use ximera::{
     app::App,
 };
 
-use ximera::app::input_handler::modules::CameraIHM;
+use ximera::app::input_handler::modules::TestIHM;
 
 fn main() {
 
@@ -26,10 +26,10 @@ fn main() {
 
     let mut rendr = Renderer::new(&window, &tokio_runtime);
 
-    let camera_ihm = CameraIHM::new(&mut rendr);
+    let test_ihm = TestIHM::new(&mut rendr);
 
 
     App::new(window, event_loop, rendr)
-        .add_input_handler_module(CameraIHM::module(camera_ihm))
+        .add_input_handler_module(TestIHM::module(test_ihm))
         .run();
 }

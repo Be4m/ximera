@@ -1,4 +1,4 @@
-pub mod camera;
+pub mod test;
 
 // Reexports
-pub use self::camera::CameraInputHandlerModule as CameraIHM;
+pub use self::test::TestInputHandlerModule as TestIHM;

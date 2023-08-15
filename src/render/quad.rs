@@ -1,7 +1,7 @@
 pub use VertexOrder::ClockWise as CW;
 pub use VertexOrder::CounterClockWise as CCW;
 
-use crate::utils::types::*;
+use crate::types::*;
 
 
 pub enum VertexOrder {

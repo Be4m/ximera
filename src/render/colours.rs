@@ -1,4 +1,4 @@
-use crate::utils::types::F32x3;
+use crate::types::F32x3;
 
 
 #[derive(Clone, Copy)]

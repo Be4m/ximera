@@ -3,7 +3,7 @@ use super::{
     Quad,
 };
 
-use crate::utils::types::*;
+use crate::types::*;
 
 /// High level representation of a 3d object, before rendering has to be compiled down
 /// to a Mesh struct.

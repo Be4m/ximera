@@ -8,9 +8,9 @@ use crate::render::Renderer;
 use crate::app::InputHandlerModule;
 use crate::app::input_handler::{InputType, Input};
 
-pub struct CameraInputHandlerModule {}
+pub struct TestInputHandlerModule {}
 
-impl CameraInputHandlerModule {
+impl TestInputHandlerModule {
 
     pub fn new(renderer: &mut Renderer) -> Self {
 
@@ -22,7 +22,7 @@ impl CameraInputHandlerModule {
     }
 }
 
-impl InputHandlerModule for CameraInputHandlerModule {
+impl InputHandlerModule for TestInputHandlerModule {
 
     fn process_input(&mut self, input: Input) {
 
@@ -36,19 +36,19 @@ impl InputHandlerModule for CameraInputHandlerModule {
         match key {
 
             VirtualKeyCode::W => {
-                println!("CameraIM: W");
+                println!("TestIHM: W");
             },
 
             VirtualKeyCode::A => {
-                println!("CameraIM: A");
+                println!("TestIHM: A");
             },
 
             VirtualKeyCode::D => {
-                println!("CameraIM: D");
+                println!("TestIHM: D");
             },
 
             VirtualKeyCode::S => {
-                println!("CameraIM: S");
+                println!("TestIHM: S");
             },
 
             _ => {}

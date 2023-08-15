@@ -36,27 +36,27 @@ impl InputHandler {
         }
     }
 
-    pub fn forward(&mut self, input_type: Input) {
+    pub fn forward(&mut self, input: Input) {
 
-        match input_type {
+        match input {
 
-            Input::KeyboardInput(input) => {
+            Input::KeyboardInput(val) => {
                 for handler in self.keyboard_handlers.iter_mut() {
 
                     handler.upgrade()
                         .unwrap()
                         .borrow_mut()
-                        .process_input(Input::KeyboardInput(input));
+                        .process_input(Input::KeyboardInput(val));
                 }
             },
 
-            Input::MouseMotion(delta) => {
+            Input::MouseMotion(val) => {
                 for handler in self.mouse_handlers.iter_mut() {
 
                     handler.upgrade()
                         .unwrap()
                         .borrow_mut()
-                        .process_input(Input::MouseMotion(delta));
+                        .process_input(Input::MouseMotion(val));
                 }
             },
 
