@@ -20,7 +20,7 @@ Visual simulator of chemical reactions written in Rust.
   they could do that is by dragging the atoms around or into a desirable position using their mouse. Of course, that would require nice lagging-behind
   effect giving shaders :D.
 
-- The atoms should interact with each other, or more properly said: react with one another. More on this in the [ReactionEngine](###reactionengine) section.
+- The atoms should interact with each other, or more properly said: react with one another. More on this in the [ReactionEngine](##reactionengine) section.
 
 ## ReactionEngine
 - Break points. When reactions are taking place, the user can activate break point functionality, where the reaction engine
