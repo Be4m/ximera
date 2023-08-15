@@ -7,9 +7,10 @@ use ximera::{
     app::App,
 };
 
+use ximera::app::input_handler::modules::CameraIHM;
+
 fn main() {
 
-    // --- INIT ---
     let tokio_runtime = Builder::new_current_thread()
         .build()
         .unwrap();
@@ -25,17 +26,10 @@ fn main() {
 
     let mut rendr = Renderer::new(&window, &tokio_runtime);
 
-    // Here we're going to load everything that we're going to use for the app.
-    // Then things like scenes can be switched, modules deactivated.
-    App::new(window, event_loop)
-        //.add_input_handler_module(MovementIHM::new(&mut rendr.camera))
-        //.add_input_handler_module(CameraIHM::new(&mut rendr.camera))
-        .run();
+    let camera_ihm = CameraIHM::new(&mut rendr);
 
-    // app.add_module(Module::INPUT_MODULE, renderer::CameraIM);
-    // app.add_input_module(renderer::CameraIM);
-    // app.add_input_module(renderer::CameraIM::new(&mut renderer));
-    
-    // app.load_scene(scene);
-    // app.set_active_scene(scene);
+
+    App::new(window, event_loop, rendr)
+        .add_input_handler_module(CameraIHM::module(camera_ihm))
+        .run();
 }

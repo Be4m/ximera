@@ -5,7 +5,7 @@ pub struct Renderer {
     queue: wgpu::Queue,
     surface: wgpu::Surface,
 
-    render_pipeline: wgpu::RenderPipeline,
+    //render_pipeline: wgpu::RenderPipeline,
 
     //camera: Camera,
 }
@@ -71,7 +71,11 @@ impl Renderer {
             }
         );
 
-        todo!()
+        Self {
+            device,
+            queue,
+            surface,
+        }
     }
 }
 

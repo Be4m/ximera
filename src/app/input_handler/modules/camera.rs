@@ -1,20 +1,37 @@
-#[derive(Clone, Copy)]
-pub struct CameraInputModule {}
+use std::rc::Rc;
+use std::cell::RefCell;
 
-impl CameraInputModule {
+use winit::event::VirtualKeyCode;
 
-    pub fn new(renderer: &mut Renderer) -> CameraInputModule {
+use crate::render::Renderer;
+
+use crate::app::InputHandlerModule;
+use crate::app::input_handler::{InputType, Input};
+
+pub struct CameraInputHandlerModule {}
+
+impl CameraInputHandlerModule {
+
+    pub fn new(renderer: &mut Renderer) -> Self {
 
         Self {}
     }
+
+    pub fn module(instance: Self) -> Rc::<RefCell::<Self>> {
+        Rc::new(RefCell::new(instance))
+    }
 }
 
-impl InputModule for CameraInputModule {
+impl InputHandlerModule for CameraInputHandlerModule {
 
-    fn handle_input(&self, input: &winit::event::KeyboardInput) {
+    fn process_input(&mut self, input: Input) {
 
-        // For now, in case the provided input variable doesn't contain a virtual_key value, this panics.
-        let key = input.virtual_keycode.unwrap();
+        let keyb_input = match input {
+            Input::KeyboardInput(val) => val,  
+            _ => { panic!("wrong input type specified!"); }
+        };
+
+        let key = keyb_input.virtual_keycode.unwrap();
 
         match key {
 
@@ -36,5 +53,9 @@ impl InputModule for CameraInputModule {
 
             _ => {}
         }
+    }
+    
+    fn accepted_input_types(&self) -> Vec::<InputType> {
+        vec![InputType::KeyboardInput]
     }
 }

@@ -3,15 +3,10 @@ name = "ximera"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-bytemuck = { version = "1.13.1", features = ["derive"] }
-itertools = "0.11.0"
+tokio = { version = "1.29.1", features = ["rt"] }
+ron = "0.8.0"
 uid = "0.1.7"
 wgpu = "0.16.2"
+bytemuck = { version = "1.13.1", features = ["derive"] }
 winit = "0.28.6"
-
-[dependencies.tokio]
-version = "1.29.1"
-features = ["rt"]

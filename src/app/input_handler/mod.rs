@@ -5,6 +5,6 @@ pub mod modules;
 
 // Reexports
 pub use self::{
-    input_handler::{InputHandler, InputType},
+    input_handler::{InputHandler, InputType, Input},
     input_handler_module::InputHandlerModule,
 };

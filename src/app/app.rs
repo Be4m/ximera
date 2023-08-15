@@ -1,13 +1,17 @@
 use std::sync::Mutex;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 use winit::{
+    event::*,event_loop::ControlFlow,
     window::Window,
-    event::*,
 };
+
+use crate::render::Renderer;
 
 use crate::scene::Scene;
 
-use super::input_handler::{InputHandler, InputHandlerModule, InputType};
+use super::input_handler::{InputHandler, InputHandlerModule, Input};
 
 type EventLoop = winit::event_loop::EventLoop<()>;
 
@@ -22,7 +26,8 @@ pub struct App {
 
 impl App {
 
-    pub fn new(window: Window, event_loop: EventLoop) -> Self {
+    // TODO: renderer should be optional
+    pub fn new(window: Window, event_loop: EventLoop, renderer: Renderer) -> Self {
 
         Self {
             window,
@@ -30,12 +35,11 @@ impl App {
             
             input_handler: Mutex::new(InputHandler::new()),
 
-            active_scene: Scene::default(),
+            active_scene: Scene::new(renderer),
         }
     }
 
     pub fn run(self) {
-
         self.event_loop.run(move |event, _, control_flow| {
 
             let mut input_handler = self.input_handler.lock().unwrap();
@@ -47,9 +51,19 @@ impl App {
                     ref event,
                 } if self.window.id() == window_id => match event {
 
-                    // Input Handling
+                    // Close Window
+                    WindowEvent::CloseRequested
+                    | WindowEvent::KeyboardInput {
+                        input: KeyboardInput {
+                            state: ElementState::Pressed,
+                            virtual_keycode: Some(VirtualKeyCode::Q | VirtualKeyCode::Escape),
+                            ..
+                        },
+                        ..
+                    } => *control_flow = ControlFlow::Exit,
+
                     WindowEvent::KeyboardInput { input, .. } => {
-                        input_handler.forward(InputType::KeyboardInput(input));
+                        input_handler.forward(Input::KeyboardInput(input));
                     },
 
                     _ => {}
@@ -61,7 +75,7 @@ impl App {
                 } => match event {
 
                     DeviceEvent::MouseMotion { delta } => {
-                        input_handler.forward(InputType::MouseMotion(delta));
+                        input_handler.forward(Input::MouseMotion(delta));
                     },
 
                     DeviceEvent::MouseWheel { delta } => {
@@ -76,10 +90,17 @@ impl App {
         });
     }
 
-    pub fn add_input_handler_module(&mut self, module: Box::<dyn InputHandlerModule + 'static>) {
+    pub fn add_input_handler_module(
+        self,
+        module: Rc::<RefCell::<dyn InputHandlerModule + 'static>>,
+    ) -> Self {
 
-        let mut input_handler = self.input_handler.lock().unwrap();
+        {
+            let mut input_handler = self.input_handler.lock().unwrap();
 
-        input_handler.add_module(module);
+            input_handler.add_module(module);
+        }
+
+        return self;
     }
 }
