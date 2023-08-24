@@ -63,14 +63,6 @@ impl Renderer {
         };
         surface.configure(&device, &surface_config);
 
-        let pipeline_layout = device.create_pipeline_layout(
-            &wgpu::PipelineLayoutDescriptor {
-                label: Some("Default pipeline layout"),
-                bind_group_layouts: &[],
-                push_constant_ranges: &[],
-            }
-        );
-
         Self {
             device,
             queue,

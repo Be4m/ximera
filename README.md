@@ -3,6 +3,8 @@ Visual simulator of chemical reactions written in Rust.
 
 # Feature List
 
+## UI
+
 ## Camera
 - Have a functioning camera which locks onto the atom present in the scene, or if there are multiple,
   averages out their positions and locks onto that point.
@@ -32,3 +34,4 @@ Visual simulator of chemical reactions written in Rust.
   
 # RoadMap
 - [X] Design basic software structure.
+- [ ] Implement Rendering logic.

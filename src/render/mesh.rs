@@ -1,4 +1,4 @@
-type Vertex = (f32, f32, f32);
+use cgmath::Vector3;
 
 
 /// The struct Mesh is all what Renderer needs to render an 'object' or mesh.
@@ -10,15 +10,15 @@ type Vertex = (f32, f32, f32);
 /// a method of Geometry's called `gen_mesh`.
 #[derive(Clone)]
 pub struct Mesh {
-    vertex_buffer: Vec::<Vertex>,
-    index_buffer: Vec::<i16>,
+    vertex_buffer: Vec::<Vector3::<f32>>,
+    index_buffer: Option<Vec::<i16>>,
 }
 
 impl Mesh {
 
     pub fn new(
-        vertex_buffer: Vec::<Vertex>,
-        index_buffer: Vec<i16>,
+        vertex_buffer: Vec::<Vector3::<f32>>,
+        index_buffer: Option<Vec::<i16>>,
     ) -> Mesh {
 
         Self {

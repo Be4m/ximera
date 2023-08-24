@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Atom {
     atomic_radius: f32,
     atomic_mass: f32,

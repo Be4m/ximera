@@ -2,44 +2,41 @@ use uid::IdU32;
 
 use super::Atom;
 
-use crate::{render::Mesh, scene::Position};
+use crate::render::Mesh;
 
 pub struct AtomObject {
     pub atom: Atom,
 
     pub uid: IdU32::<Self>,
     pub mesh: Mesh,
-    pub position: Position,
+    pub position: cgmath::Vector3::<f32>,
 }
 
 impl AtomObject {
 
     pub fn new(
-        atom: &Atom,
-        mesh: &Mesh,
-        position: &Position,
+        atom: Atom,
+        mesh: Mesh,
+        position: cgmath::Vector3::<f32>,
     ) -> AtomObject {
 
         Self {
-            atom: atom.clone(),
+            atom: atom,
 
             uid: IdU32::new(),
-            mesh: mesh.clone(),
-            position: position.clone(),
+            mesh: mesh,
+            position: position,
         }
     }
 
     pub fn instance(&self) -> Self {
 
-        let new_uid = IdU32::new();
-        let new_pos = self.position.mut_up(1.0);
-
         Self {
-            atom: self.atom.clone(),
+            atom: self.atom,
 
-            uid: new_uid,
+            uid: IdU32::new(),
             mesh: self.mesh.clone(),
-            position: new_pos,
+            position: self.position,
         }
     }
 }

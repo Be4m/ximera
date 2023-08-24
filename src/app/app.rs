@@ -79,11 +79,17 @@ impl App {
                     },
 
                     DeviceEvent::MouseWheel { delta } => {
-                        // input_handler.forward_mouse_wheel()
+                        //input_handler.forward(Input::MouseWheelSpin(delta));
                     },
 
                     _ => {}
                 },
+
+                Event::RedrawRequested(window_id) if self.window.id() == window_id => {
+
+                    // #1: self.scene_render_manager.render(&self.active_scene);
+                    // #2: self.scene.render();
+                }
 
                 _ => {}
             }
