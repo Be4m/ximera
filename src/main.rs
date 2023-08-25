@@ -26,7 +26,7 @@ fn main() {
 
     let mut rendr = Renderer::new(&window, &tokio_runtime);
 
-    let test_ihm = TestIHM::new(&mut rendr);
+    let test_ihm = TestIHM::new();
 
     App::new(window, event_loop, rendr)
         .add_input_handler_module(TestIHM::module(test_ihm))

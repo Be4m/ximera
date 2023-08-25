@@ -3,13 +3,15 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use winit::{
-    event::*,event_loop::ControlFlow,
+    event::*,
+    event_loop::ControlFlow,
     window::Window,
 };
 
-use crate::render::Renderer;
-
-use crate::scene::Scene;
+use crate::{
+    render::Renderer,
+    scene::Scene,
+};
 
 use super::input_handler::{InputHandler, InputHandlerModule, Input};
 

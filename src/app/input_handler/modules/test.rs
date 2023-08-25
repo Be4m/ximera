@@ -3,8 +3,6 @@ use std::cell::RefCell;
 
 use winit::event::VirtualKeyCode;
 
-use crate::render::Renderer;
-
 use crate::app::InputHandlerModule;
 use crate::app::input_handler::{InputType, Input};
 
@@ -12,7 +10,7 @@ pub struct TestInputHandlerModule {}
 
 impl TestInputHandlerModule {
 
-    pub fn new(renderer: &mut Renderer) -> Self {
+    pub fn new() -> Self {
 
         Self {}
     }
