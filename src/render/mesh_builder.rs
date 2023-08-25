@@ -1,6 +1,4 @@
-use cgmath::Vector3;
-
-use super::Mesh;
+use super::{Mesh, Vertex};
 
 /// This struct's made easy to generate meshes.
 /// 
@@ -15,8 +13,10 @@ use super::Mesh;
 /// TOOD: For use cases where generating geometry on-the-fly is necessary, we should implement a new
 /// struct solely for this purpose: DynamicMeshBuilder, or something similar.
 pub struct MeshBuilder {
-    triangles: Vec::<Triangle>,
-    quads: Vec::<Quad>,
+    vertices: Vec<Vertex>,
+
+    triangles: Vec<Triangle>,
+    quads: Vec<Quad>,
 }
 
 impl MeshBuilder {
@@ -24,9 +24,15 @@ impl MeshBuilder {
     pub fn new() -> Self {
 
         Self {
+            vertices: vec![],
+
             triangles: vec![],
             quads: vec![],
         }
+    }
+
+    pub fn add_vertices(&mut self, vertices: &[Vertex]) {
+        self.vertices.extend(vertices);
     }
 
     pub fn add_triangles(&mut self, triangles: &[Triangle]) {
@@ -41,35 +47,45 @@ impl MeshBuilder {
     // I've faced a challange that at the present moment I am not sure how to correctly overcome.
     // The fact that you can't compare two floats with one another was causing me lots of frustration and time;
     // and thus I have decided to leave this matter for the future or for more clever minds.
-    pub fn build(self) -> Mesh {
+    pub fn build(self, device: &wgpu::Device) -> Mesh {
 
-        let vertex_buffer = vec![
+        let vertex_data = &[
+            self.vertices,
             self.triangles.into_iter()
                 .flatten()
-                .collect::<Vec<Vector3::<f32>>>(),
+                .collect::<Vec<Vertex>>(),
             self.quads.into_iter()
                 .flat_map(|q| q.triangulate())
                 .flatten()
-                .collect::<Vec<Vector3::<f32>>>()
+                .collect::<Vec<Vertex>>()
         ].concat();
 
-        Mesh::new(vertex_buffer, None)
+        let num_vertices = vertex_data.len() as u32;
+
+        use wgpu::util::DeviceExt;
+        let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(vertex_data),
+            usage: wgpu::BufferUsages::VERTEX,
+        });
+
+        Mesh::new(vertex_buffer, num_vertices, None)
     }
 }
 
 #[derive(Clone, Copy)]
 pub struct Triangle {
-    a: Vector3::<f32>,
-    b: Vector3::<f32>,
-    c: Vector3::<f32>,
+    a: Vertex,
+    b: Vertex,
+    c: Vertex,
 }
 
 #[derive(Clone, Copy)]
 pub struct Quad {
-    a: Vector3::<f32>,
-    b: Vector3::<f32>,
-    c: Vector3::<f32>,
-    d: Vector3::<f32>,
+    a: Vertex,
+    b: Vertex,
+    c: Vertex,
+    d: Vertex,
 }
 
 impl Quad {
@@ -101,7 +117,7 @@ pub struct TriangleIntoIter {
 }
 
 impl Iterator for TriangleIntoIter {
-    type Item = Vector3::<f32>;
+    type Item = Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
         let result = match self.index {
@@ -117,7 +133,7 @@ impl Iterator for TriangleIntoIter {
 }
 
 impl IntoIterator for Triangle {
-    type Item = Vector3::<f32>;
+    type Item = Vertex;
     type IntoIter = TriangleIntoIter;
 
     fn into_iter(self) -> Self::IntoIter {

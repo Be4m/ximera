@@ -29,14 +29,20 @@ impl AtomObject {
         }
     }
 
-    pub fn instance(&self) -> Self {
+    // pub fn instance(&self) -> Self {
 
-        Self {
-            atom: self.atom,
+    //     Self {
+    //         atom: self.atom,
 
-            uid: IdU32::new(),
-            mesh: self.mesh.clone(),
-            position: self.position,
-        }
+    //         uid: IdU32::new(),
+    //         mesh: self.mesh,
+    //         position: self.position,
+    //     }
+    // }
+}
+
+impl crate::render::Renderable for AtomObject {
+    fn mesh(&self) -> &Mesh {
+        &self.mesh
     }
 }

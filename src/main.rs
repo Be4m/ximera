@@ -28,7 +28,6 @@ fn main() {
 
     let test_ihm = TestIHM::new(&mut rendr);
 
-
     App::new(window, event_loop, rendr)
         .add_input_handler_module(TestIHM::module(test_ihm))
         .run();
