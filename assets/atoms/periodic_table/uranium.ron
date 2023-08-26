@@ -1,0 +1,18 @@
+Identity(
+    atom: "",
+    isotope: "carbon12",
+)
+
+Display(
+    name: "Carbon",
+    symbol: "C",
+    isotope: ["Carbon-12", "[^12]C"],
+)
+
+// Source: https://en.wikipedia.org/wiki/Uranium
+Properties(
+    atomic_radius: 70.0,
+    atomic_mass: 12.011,
+    num_protons: 6,
+    num_neutrons: 6,
+)
