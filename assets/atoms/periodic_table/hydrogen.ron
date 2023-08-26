@@ -1,18 +1,21 @@
 Identity(
-    atom: "carbon",
-    isotope: "carbon12",
+    atom: "hydrogen",
+    isotope: "hydrogen1",
 )
 
 Display(
-    name: "Carbon",
-    symbol: "C",
-    isotope: ["Carbon-12", "[^12]C"],
+    name: "Hydrogen",
+    symbol: "H",
+    isotope: ["Hydrogen-1", "[^1]H"],
 )
 
-// Source: https://en.wikipedia.org/wiki/Carbon
+// Source: https://en.wikipedia.org/wiki/Hydrogen
 Properties(
-    atomic_radius: 70.0,
-    atomic_mass: 12.011,
-    num_protons: 6,
-    num_neutrons: 6,
+    atomic_radius: 53.0,
+    atomic_mass: 1.008,
+    num_protons: 1,
+    num_neutrons: 0,
+    num_electrons 1,
+
+    electron_configuration: ["1s1"]
 )

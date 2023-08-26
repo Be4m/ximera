@@ -1,18 +1,21 @@
 Identity(
-    atom: "carbon",
-    isotope: "carbon12",
+    atom: "helium",
+    isotope: "helium4",
 )
 
 Display(
-    name: "Carbon",
-    symbol: "C",
-    isotope: ["Carbon-12", "[^12]C"],
+    name: "Helium",
+    symbol: "H",
+    isotope: ["Helium-4", "[^4]H"],
 )
 
-// Source: https://en.wikipedia.org/wiki/Carbon
+// Source: https://en.wikipedia.org/wiki/Helium
 Properties(
-    atomic_radius: 70.0,
-    atomic_mass: 12.011,
-    num_protons: 6,
-    num_neutrons: 6,
+    atomic_radius: 140.0,
+    atomic_mass: 4.002602,
+    num_protons: 2,
+    num_neutrons: 2,
+    num_electrons 2,
+
+    electron_configuration: ["1s2"]
 )

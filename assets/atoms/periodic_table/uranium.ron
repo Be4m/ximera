@@ -1,18 +1,21 @@
 Identity(
-    atom: "",
-    isotope: "carbon12",
+    atom: "uranium",
+    isotope: "uranium238",
 )
 
 Display(
-    name: "Carbon",
-    symbol: "C",
-    isotope: ["Carbon-12", "[^12]C"],
+    name: "Uranium",
+    symbol: "U",
+    isotope: ["Uranium-238", "[^238]U"],
 )
 
 // Source: https://en.wikipedia.org/wiki/Uranium
 Properties(
-    atomic_radius: 70.0,
-    atomic_mass: 12.011,
-    num_protons: 6,
-    num_neutrons: 6,
+    atomic_radius: 230.0,
+    atomic_mass: 238.02891,
+    num_protons: 92,
+    num_neutrons: 146,
+    num_electrons: 92,
+
+    electron_configuration: ["1s2", "2s2", "2p6", "3s2", "3p6", "4s2", "3d10", "4p6", "5s2", "4d10", "5p6", "6s2", "4f14", "5d10", "6p6", "5f3", "6d1", "7s2"],
 )
