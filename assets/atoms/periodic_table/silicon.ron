@@ -1,0 +1,21 @@
+Identity(
+    atom: "silicon",
+    isotope: "silicon28",
+)
+
+Display(
+    name: "Silicon",
+    symbol: "Si",
+    isotope: ["Silicon-28", "[^28]Si"],
+)
+
+// Source: https://en.wikipedia.org/wiki/Silicon
+Properties(
+    atomic_radius: 210.0,
+    atomic_mass: 28.0855,
+    num_protons: 14,
+    num_neutrons: 14,
+    num_electrons 14,
+
+    electron_configuration: ["1s2", "2s2", "2p6", "3s2", "3p2"]
+)

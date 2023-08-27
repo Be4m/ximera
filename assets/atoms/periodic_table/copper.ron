@@ -1,0 +1,21 @@
+Identity(
+    atom: "copper",
+    isotope: "copper63",
+)
+
+Display(
+    name: "Copper",
+    symbol: "Cu",
+    isotope: ["Copper-63", "[^63]Cu"],
+)
+
+// Source: https://en.wikipedia.org/wiki/Copper
+Properties(
+    atomic_radius: 128.0,
+    atomic_mass: 63.546,
+    num_protons: 29,
+    num_neutrons: 35,
+    num_electrons 29,
+
+    electron_configuration: ["1s2", "2s2", "2p6", "3s2", "3p6", "3d9"]
+)

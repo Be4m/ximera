@@ -1,0 +1,21 @@
+Identity(
+    atom: "nitrogen",
+    isotope: "nitrogen14",
+)
+
+Display(
+    name: "Nitrogen",
+    symbol: "N",
+    isotope: ["Nitrogen-14", "[^14]N"],
+)
+
+// Source: https://en.wikipedia.org/wiki/Nitrogen
+Properties(
+    atomic_radius: 56.0,
+    atomic_mass: 14.0067,
+    num_protons: 7,
+    num_neutrons: 7,
+    num_electrons 7,
+
+    electron_configuration: ["1s2", "2s2", "2p3"]
+)
