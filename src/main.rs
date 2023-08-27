@@ -24,11 +24,14 @@ fn main() {
         .unwrap();
     // ------------
 
-    let mut rendr = Renderer::new(&window, &tokio_runtime);
+    let rendr = Renderer::new(&window, &tokio_runtime);
 
     let test_ihm = TestIHM::new();
 
     App::new(window, event_loop, rendr)
         .add_input_handler_module(TestIHM::module(test_ihm))
+        //.enable_input_handler_module(InputHandlerModules::Camera)
+        //.enable_input_handler_module(InputHandlerModules::Movement)
+        .init()
         .run();
 }

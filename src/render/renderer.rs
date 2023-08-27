@@ -1,9 +1,10 @@
-use super::mesh::Mesh;
+use super::{mesh::Mesh, pipelines::MeshDebugPipeline};
 
 pub struct Renderer {
-    device: wgpu::Device,
-    queue: wgpu::Queue,
-    surface: wgpu::Surface,
+    pub device: wgpu::Device,
+    pub queue: wgpu::Queue,
+    pub surface: wgpu::Surface,
+    pub surface_format: wgpu::TextureFormat,
 
     //render_pipeline: wgpu::RenderPipeline,
 
@@ -63,18 +64,32 @@ impl Renderer {
         };
         surface.configure(&device, &surface_config);
 
-        let layouts = {};
+        // TODO: Temporary
+        // let shader_mod = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        //     label: None,
+        //     source: wgpu::ShaderSource::Wgsl(include_str!("default.wgsl").into()),
+        // });
+
+        // let pipelines = {
+        //     let mesh_debug = MeshDebugPipeline::new(
+        //         &device,
+        //         &shader_mod,
+        //         &shader_mod,
+        //         surface_format,
+        //     );
+        // };
 
         Self {
             device,
             queue,
             surface,
+            surface_format,
         }
     }
 
     pub fn render<T: Renderable>(
         &self,
-        renderable: T,
+        renderable: &T,
         pipeline: super::Pipeline,
     ) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
@@ -94,8 +109,8 @@ impl Renderer {
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
                             r: 1.0,
-                            g: 1.0,
-                            b: 1.0,
+                            g: 0.0,
+                            b: 0.0,
                             a: 1.0,
                         }),
                         store: true,

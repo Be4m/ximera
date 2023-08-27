@@ -1,12 +1,12 @@
 #[derive(Clone, Copy)]
 pub struct Atom {
-    atomic_radius: f32,
-    atomic_mass: f32,
-    num_protons: u32,
-    num_neutrons: u32,
-    
-    name: Option<&'static str>,
-    symbol: Option<&'static str>,
+    pub atomic_radius: f32,
+    pub atomic_mass: f32,
+    pub num_protons: u32,
+    pub num_neutrons: u32,
+     
+    pub name: Option<&'static str>,
+    pub symbol: Option<&'static str>,
     
     //mesh: crate::scene::Mesh,
 }

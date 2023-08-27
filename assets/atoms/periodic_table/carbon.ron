@@ -15,4 +15,7 @@ Properties(
     atomic_mass: 12.011,
     num_protons: 6,
     num_neutrons: 6,
+    num_electrons: 6,
+
+    electron_configuration: ["1s2", "2s2", "2p2"],
 )
