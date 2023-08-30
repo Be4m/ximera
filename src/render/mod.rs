@@ -1,14 +1,15 @@
 pub mod renderer;
+pub mod camera;
 pub mod pipelines;
 pub mod colours;
 
 pub mod mesh;
-pub mod mesh_builder;
+pub mod model_builder;
 
 // Reexports
 pub use self::{
-    renderer::{Renderer, Renderable},
-    mesh::{Mesh, Vertex},
+    renderer::Renderer,
+    mesh::{Model, Mesh, Vertex},
 
     pipelines::Pipeline,
 };

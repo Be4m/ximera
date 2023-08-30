@@ -1,51 +1,46 @@
-/// The struct Mesh is all what Renderer needs to render an 'object' or mesh.
-/// The Mesh struct, not like Geometry struct, is low-level representation of a geometry,
-/// containing only a vertex and index buffers.
-/// 
-/// The Geometry struct is based on triangles and has convinient functions, like: add_quad.
-/// Before rendering, geometry has to be compiled down to a Mesh struct. To do so you can use
-/// a method of Geometry's called `gen_mesh`.
-pub struct Mesh {
-    pub vertex_buffer: wgpu::Buffer,
-    pub num_vertices: u32,
-    pub index_buffer: Option<wgpu::Buffer>,
-}
-
-impl Mesh {
-
-    pub fn new(
-        vertex_buffer: wgpu::Buffer,
-        num_vertices: u32,
-        index_buffer: Option<wgpu::Buffer>,
-    ) -> Mesh {
-
-        Self {
-            vertex_buffer,
-            num_vertices,
-            index_buffer,
-        }
-    }
-}
-
-// TODO: This should be renamed to MeshVertex or PositionVertex, etc.
+// I don't think we're going to need more than one vertex for this program as of now.
 #[repr(C)]
-#[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Vertex {
     pub position: [f32; 3],
 }
 
-impl<'a> Vertex {
-    pub fn desc() -> wgpu::VertexBufferLayout<'a> {
+impl Vertex {
+    pub fn buffer_layout() -> wgpu::VertexBufferLayout<'static> {
         wgpu::VertexBufferLayout {
-            array_stride: std::mem::size_of::<Vertex>() as wgpu::BufferAddress,
+            array_stride: std::mem::size_of::<Self>() as wgpu::BufferAddress,
             step_mode: wgpu::VertexStepMode::Vertex,
             attributes: &[
                 wgpu::VertexAttribute {
                     format: wgpu::VertexFormat::Float32x3,
                     offset: 0,
                     shader_location: 0,
-                },
+                }
             ],
         }
     }
+}
+
+pub struct Model {
+    pub transform: nalgebra::Transform3<f32>,
+    
+    pub vertex_data: Vec<Vertex>,
+    pub index_data: Vec<i16>,
+    
+    pub num_vertices: u32,
+    pub num_indices: u32,
+}
+
+pub struct MeshData {
+    pub vertex_buffer: wgpu::Buffer,
+    pub index_buffer: wgpu::Buffer,
+    pub num_vertices: u32,
+    pub num_indices: u32,
+
+    pub model_mat: [[f32; 4]; 4],
+}
+
+pub enum Mesh {
+    Created(MeshData),
+    Loaded(MeshData)
 }

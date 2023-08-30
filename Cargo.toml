@@ -11,5 +11,5 @@ uid = "0.1.7"
 wgpu = "0.16.2"
 bytemuck = { version = "1.13.1", features = ["derive"] }
 winit = "0.28.6"
-cgmath = "0.18.0"
-instant = "0.1.12"
+bitflags = "2.4.0"
+nalgebra = { version = "0.32.3", features = ["bytemuck", "serde"] }

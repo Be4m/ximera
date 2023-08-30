@@ -13,7 +13,7 @@ impl Pipeline {
     pub fn pipeline(&self) -> &wgpu::RenderPipeline {
 
         match self {
-            Pipeline::MeshDebugPipeline(val) => &val.render_pipeline,
+            Pipeline::MeshDebugPipeline(pipeline) => &pipeline.render_pipeline,
         }
     }
 }

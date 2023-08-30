@@ -7,8 +7,6 @@ use ximera::{
     app::App,
 };
 
-use ximera::app::input_handler::modules::TestIHM;
-
 fn main() {
 
     let tokio_runtime = Builder::new_current_thread()
@@ -26,12 +24,8 @@ fn main() {
 
     let rendr = Renderer::new(&window, &tokio_runtime);
 
-    let test_ihm = TestIHM::new();
+    let mut app = App::new(window, event_loop, rendr);
 
-    App::new(window, event_loop, rendr)
-        .add_input_handler_module(TestIHM::module(test_ihm))
-        //.enable_input_handler_module(InputHandlerModules::Camera)
-        //.enable_input_handler_module(InputHandlerModules::Movement)
-        .init()
-        .run();
+    app.init();
+    app.run();
 }

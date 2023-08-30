@@ -1,8 +1,10 @@
 pub mod scene;
-pub mod object;
+pub mod scene_object;
+
+pub mod scene_user_interface;
 
 // Reexports
 pub use self::{
     scene::Scene,
-    object::Object,
+    scene_object::{SceneObject, SceneObjectKind},
 };

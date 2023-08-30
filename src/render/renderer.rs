@@ -1,10 +1,13 @@
-use super::{mesh::Mesh, pipelines::MeshDebugPipeline};
+//use super::{mesh::Mesh, pipelines::MeshDebugPipeline};
 
 pub struct Renderer {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
+
     pub surface: wgpu::Surface,
     pub surface_format: wgpu::TextureFormat,
+    pub resolution: winit::dpi::PhysicalSize<u32>,
+
 
     //render_pipeline: wgpu::RenderPipeline,
 
@@ -20,7 +23,7 @@ impl Renderer {
 
         let instance = wgpu::Instance::new(
             wgpu::InstanceDescriptor {
-                backends: wgpu::Backends::VULKAN,
+                backends: wgpu::Backends::all(),
                 ..Default::default()
             }
         );
@@ -82,64 +85,54 @@ impl Renderer {
         Self {
             device,
             queue,
+            
             surface,
             surface_format,
+            resolution: size,
         }
     }
 
-    pub fn render<T: Renderable>(
-        &self,
-        renderable: &T,
-        pipeline: super::Pipeline,
-    ) -> Result<(), wgpu::SurfaceError> {
-        let output = self.surface.get_current_texture()?;
-        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+    // pub fn render<T: Renderable>(
+    //     &self,
+    //     renderable: &T,
+    //     pipeline: super::Pipeline,
+    // ) -> Result<(), wgpu::SurfaceError> {
+    //     let output = self.surface.get_current_texture()?;
+    //     let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-        let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
+    //     let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
 
-        {
-            // TODO: color_attachments should be dictated by the active scene.
-            // IDEA: Maybe Renderable should be substituted for something like SceneObject
-            // which would contain a reference to the relevant scene that holds variables like bg_colour and so on.
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: None,
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 1.0,
-                            g: 0.0,
-                            b: 0.0,
-                            a: 1.0,
-                        }),
-                        store: true,
-                    }
-                })],
-                depth_stencil_attachment: None,
-            });
+    //     {
+    //         // TODO: color_attachments should be dictated by the active scene.
+    //         // IDEA: Maybe Renderable should be substituted for something like SceneObject
+    //         // which would contain a reference to the relevant scene that holds variables like bg_colour and so on.
+    //         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+    //             label: None,
+    //             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+    //                 view: &view,
+    //                 resolve_target: None,
+    //                 ops: wgpu::Operations {
+    //                     load: wgpu::LoadOp::Clear(wgpu::Color {
+    //                         r: 1.0,
+    //                         g: 0.0,
+    //                         b: 0.0,
+    //                         a: 1.0,
+    //                     }),
+    //                     store: true,
+    //                 }
+    //             })],
+    //             depth_stencil_attachment: None,
+    //         });
 
-            render_pass.set_pipeline(pipeline.pipeline());
-            render_pass.set_vertex_buffer(0, renderable.vertex_buffer().slice(..));
+    //         render_pass.set_pipeline(pipeline.pipeline());
+    //         render_pass.set_vertex_buffer(0, renderable.vertex_buffer().slice(..));
 
-            render_pass.draw(0..renderable.num_vertices(), 0..1);
-        }
+    //         render_pass.draw(0..renderable.num_vertices(), 0..1);
+    //     }
 
-        self.queue.submit(std::iter::once(encoder.finish()));
-        output.present();
+    //     self.queue.submit(std::iter::once(encoder.finish()));
+    //     output.present();
 
-        Ok(())
-    }
-}
-
-pub trait Renderable {
-    fn mesh(&self) -> &Mesh;
-
-    fn vertex_buffer(&self) -> &wgpu::Buffer {
-        &self.mesh().vertex_buffer
-    }
-
-    fn num_vertices(&self) -> u32 {
-        self.mesh().num_vertices
-    }
+    //     Ok(())
+    // }
 }
