@@ -1,5 +1,5 @@
 use nalgebra::{
-    Point3, Transform3,
+    Point3, Similarity3,
 };
 
 use super::{
@@ -82,13 +82,39 @@ impl ModelBuilder {
         let num_indices = index_data.len() as u32;
 
         Model {
-            transform: Transform3::identity(),
+            transform: Similarity3::identity(),
             vertex_data,
             index_data,
             num_vertices,
             num_indices,
             pipeline_kind: self.special_pipeline.unwrap_or(PipelineKind::Model),
         }
+    }
+
+    pub fn build_simple_cube(
+        radius: f32,
+    ) -> Self {
+        let mut model_builder = ModelBuilder::new();
+
+        model_builder.add_point(Point3::new(-radius, radius, -radius));
+        model_builder.add_point(Point3::new(-radius, radius, radius));
+        model_builder.add_point(Point3::new(radius, radius, radius));
+        model_builder.add_point(Point3::new(radius, radius, -radius));
+
+        model_builder.add_point(Point3::new(-radius, -radius, -radius));
+        model_builder.add_point(Point3::new(-radius, -radius, radius));
+        model_builder.add_point(Point3::new(radius, -radius, radius));
+        model_builder.add_point(Point3::new(radius, -radius, -radius));
+
+        model_builder.index_quad([0, 1, 2, 3]); // TOP
+        model_builder.index_quad([0, 3, 7, 4]); // NORTH
+        model_builder.index_quad([1, 0, 4, 5]); // WEST
+        model_builder.index_quad([3, 2, 6, 7]); // EAST
+        model_builder.index_quad([1, 2, 6, 5]); // SOUTH
+        model_builder.index_quad([4, 5, 6, 7]); // BOTTOM
+
+
+        return model_builder;
     }
 
     pub fn build_uv_sphere(

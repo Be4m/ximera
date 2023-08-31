@@ -1,4 +1,4 @@
-use nalgebra::Transform3;
+use nalgebra::*;
 use wgpu::util::DeviceExt;
 
 use crate::render::pipelines::BindGroupKind;
@@ -7,6 +7,8 @@ use super::{
     pipelines::{PipelineKind, BindGroupLayouts},
     mesh::Mesh,
 };
+
+pub type Axis = Unit<Matrix<f32, Const<3>, Const<1>, ArrayStorage<f32, 3, 1>>>;
 
 // I don't think we're going to need more than one vertex for this program as of now.
 #[repr(C)]
@@ -45,7 +47,7 @@ impl From<nalgebra::Point3<f32>> for Vertex {
 
 #[derive(Clone)]
 pub struct Model {
-    pub transform: Transform3<f32>,
+    pub transform: Similarity3<f32>,
     
     pub vertex_data: Vec<Vertex>,
     pub index_data: Vec<i16>,
@@ -57,6 +59,11 @@ pub struct Model {
 }
 
 impl Model {
+    pub fn rotate(&mut self, axis: &Axis, radians: f32) {
+        let rotation = UnitQuaternion::from_axis_angle(axis, radians);
+        self.transform.append_rotation_mut(&rotation);
+    }
+
     pub fn create_mesh(
         &self,
         device: &wgpu::Device,
@@ -73,7 +80,7 @@ impl Model {
             usage: wgpu::BufferUsages::INDEX,
         });
 
-        let model_mat: [[f32; 4]; 4] = bytemuck::cast(self.transform);
+        let model_mat: [[f32; 4]; 4] = bytemuck::cast(self.transform.to_homogeneous());
         let model_mat_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: None,
             contents: bytemuck::cast_slice(&model_mat),
@@ -95,7 +102,8 @@ impl Model {
                                 }
                             ]
                         })
-                    }
+                    },
+                    BindGroupKind::Camera => todo!()
                 }
             })
             .collect::<Vec<_>>();

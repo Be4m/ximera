@@ -66,9 +66,16 @@ impl App {
         self.is_initialised = true;
     }
 
-    pub fn run(self) {
+    pub fn run(mut self) {
         // Make sure the application is initialised before running it.
         assert!(self.is_initialised);
+
+        use crate::render::model_builder::ModelBuilder;
+        use crate::render::pipelines::PipelineKind;
+
+        let mut cube_model = ModelBuilder::build_simple_cube(0.5)
+            .set_pipeline(PipelineKind::MeshDebug)
+            .build();
 
         self.event_loop.run(move |event, _, control_flow| {
 
@@ -92,9 +99,12 @@ impl App {
                         ..
                     } => *control_flow = ControlFlow::Exit,
 
+                    WindowEvent::Resized(physical_size) => {
+                        self.renderer.update_resolution(*physical_size);
+                    },
+
                     WindowEvent::KeyboardInput { input, .. } => {
                         input_handler.forward(Input::KeyboardInput(input));
-
                     },
 
                     _ => {}
@@ -117,21 +127,19 @@ impl App {
                 },
 
                 Event::RedrawRequested(window_id) if self.window.id() == window_id => {
-                    
-                    // SPHERE DEMO
-                    use crate::render::model_builder::ModelBuilder;
-                    use crate::render::pipelines::PipelineKind;
 
-                    let sphere_model = ModelBuilder::build_uv_sphere(0.5, 32, 32)
-                        .set_pipeline(PipelineKind::MeshDebug)
-                        .build();
+                    // DEMO
+                    cube_model.rotate(
+                        &nalgebra::Vector3::y_axis(),
+                        std::f32::consts::TAU / 260.0,
+                    );
 
-                    let sphere_mesh = sphere_model.create_mesh(
+                    let cube_mesh = cube_model.create_mesh(
                         &self.renderer.device,
                         &self.renderer.bind_group_layouts,
                     );
 
-                    self.renderer.render_mesh(&sphere_mesh).unwrap();
+                    self.renderer.render_mesh(&cube_mesh).unwrap();
                 },
 
                 Event::MainEventsCleared => self.window.request_redraw(),

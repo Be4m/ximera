@@ -1,5 +1,5 @@
 use uid::*;
-use nalgebra::Vector3;
+use nalgebra::{Vector3, Translation3};
 
 use std::collections::HashMap;
 
@@ -70,9 +70,8 @@ impl Scene {
             .get_mut(&object_id.clone().get())
             .ok_or(())?;
 
-        obj.model.transform
-            .matrix_mut()
-            .append_translation_mut(&vector);
+        let translation = Translation3::from(vector);
+        obj.model.transform.append_translation_mut(&translation);
 
         Ok(())
     }

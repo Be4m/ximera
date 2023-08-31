@@ -1,6 +1,6 @@
 use super::{
     Shaders,
-    pipelines::{Pipelines, MeshDebugPipeline, BindGroupLayouts},
+    pipelines::{Pipelines, MeshDebugPipeline, BindGroupLayouts, ModelPipeline},
     Mesh,
 };
 
@@ -10,6 +10,7 @@ pub struct Renderer {
     pub queue: wgpu::Queue,
 
     pub surface: wgpu::Surface,
+    pub surface_config: wgpu::SurfaceConfiguration,
     pub surface_format: wgpu::TextureFormat,
     pub resolution: winit::dpi::PhysicalSize<u32>,
 
@@ -76,9 +77,16 @@ impl Renderer {
         let pipelines = Pipelines {
             mesh_debug: MeshDebugPipeline::new(
                 &device,
-                &shaders.dummy,
-                &shaders.dummy,
+                &shaders.model,
+                &shaders.model,
                 surface_format,
+                &bind_group_layouts,
+            ),
+            model: ModelPipeline::new(
+                &device,
+                &shaders.model,
+                surface_format,
+                &bind_group_layouts,
             ),
         };
         
@@ -87,12 +95,24 @@ impl Renderer {
             queue,
             
             surface,
+            surface_config,
             surface_format,
             resolution: size,
 
             pipelines,
             bind_group_layouts,
         }
+    }
+
+    pub fn update_resolution(
+        &mut self,
+        new_resolution: winit::dpi::PhysicalSize<u32>,
+    ) {
+        self.resolution = new_resolution;
+        self.surface_config.width = new_resolution.width;
+        self.surface_config.height = new_resolution.height;
+
+        self.surface.configure(&self.device, &self.surface_config);
     }
 
     pub fn render_mesh(&self, mesh: &Mesh) -> Result<(), wgpu::SurfaceError> {

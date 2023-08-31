@@ -38,7 +38,8 @@ impl PipelineKind {
     pub fn get_pipeline<'a>(&'a self, pipelines: &'a Pipelines) -> Pipeline {
         match self {
             PipelineKind::MeshDebug => Pipeline::MeshDebugPipeline(&pipelines.mesh_debug),
-            _ => todo!(),
+            PipelineKind::Model => Pipeline::ModelPipeline(&pipelines.model),
+            PipelineKind::Dummy => todo!(),
         }
     }
 
@@ -72,23 +73,28 @@ impl PipelineKind {
 
 pub enum Pipeline<'a> {
     MeshDebugPipeline(&'a MeshDebugPipeline),
+    ModelPipeline(&'a ModelPipeline),
 }
 
 impl<'a> Pipeline<'a> {
     pub fn render_pipeline(&self) -> &wgpu::RenderPipeline {
         match self {
             Pipeline::MeshDebugPipeline(pipeline) => &pipeline.render_pipeline,
+            Pipeline::ModelPipeline(pipeline) => &pipeline.render_pipeline,
         }
     }
 }
 
 pub struct Pipelines {
     pub mesh_debug: MeshDebugPipeline,
+    pub model: ModelPipeline,
 }
 
+// TODO: This seems like the right place to use bitfields
 #[repr(u8)]
 pub enum BindGroupKind {
     Model = 0,
+    Camera,
 }
 
 impl std::convert::TryFrom<usize> for BindGroupKind {

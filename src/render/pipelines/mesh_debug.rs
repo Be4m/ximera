@@ -1,7 +1,7 @@
 use crate::render::Vertex;
 use super::{
     BindGroupLayouts, BindGroupLayoutMap,
-    bind_group_map,
+    bind_group_map, BindGroupKind,
 };
 
 pub struct MeshDebugPipeline {
@@ -11,6 +11,7 @@ pub struct MeshDebugPipeline {
 impl MeshDebugPipeline {
     pub const BIND_GROUP_MAP: BindGroupLayoutMap = bind_group_map!(
         BindGroupLayouts::NUM_LAYOUTS,
+        BindGroupKind::Model
     );
 
     pub fn new(
@@ -18,6 +19,7 @@ impl MeshDebugPipeline {
         vs_module: &wgpu::ShaderModule,
         fs_module: &wgpu::ShaderModule,
         target_format: wgpu::TextureFormat,
+        bind_group_layouts: &BindGroupLayouts,
     ) -> Self {
 
         // Make sure that "Wireframe" rendering is enabled for debug pipeline
@@ -25,7 +27,9 @@ impl MeshDebugPipeline {
 
         let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Mesh Debug pipeline layout"),
-            bind_group_layouts: &[],
+            bind_group_layouts: &[
+                &bind_group_layouts.model,
+            ],
             push_constant_ranges: &[],
         });
 

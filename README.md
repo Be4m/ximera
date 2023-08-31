@@ -34,4 +34,4 @@ Visual simulator of chemical reactions written in Rust.
   
 # RoadMap
 - [X] Design basic software structure.
-- [ ] Implement Rendering logic.
+- [X] Implement Rendering logic.
