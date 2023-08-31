@@ -117,10 +117,12 @@ impl App {
                 },
 
                 Event::RedrawRequested(window_id) if self.window.id() == window_id => {
+                    
+                    // SPHERE DEMO
                     use crate::render::model_builder::ModelBuilder;
                     use crate::render::pipelines::PipelineKind;
 
-                    let sphere_model = ModelBuilder::build_uv_sphere(1.0, 8, 8)
+                    let sphere_model = ModelBuilder::build_uv_sphere(0.5, 32, 32)
                         .set_pipeline(PipelineKind::MeshDebug)
                         .build();
 

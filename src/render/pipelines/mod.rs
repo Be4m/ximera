@@ -15,6 +15,7 @@ macro_rules! bind_group_map {
         $( $layout: expr ),*
     ) => {
         {
+            #[allow(unused_mut)] // This must be a bug
             let mut temp_array: [bool; $bound] = [false; $bound];
 
             $(
@@ -128,17 +129,5 @@ impl BindGroupLayouts {
         Self {
             model,
         }
-    }
-
-    pub fn get_from_bool_map(&self, map: [bool; Self::NUM_LAYOUTS]) -> Vec<&wgpu::BindGroupLayout> {
-        map.into_iter()
-            .enumerate()
-            .filter_map(|(i, v)| {
-                match i.try_into() {
-                    Ok(BindGroupKind::Model) => Some(&self.model),
-                    Err(_) => panic!("NUM_BIND_GROUP_LAYOUTS exceeded!"),
-                }
-            })
-            .collect::<Vec<_>>()
     }
 }

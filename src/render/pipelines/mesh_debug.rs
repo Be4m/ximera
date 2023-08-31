@@ -1,4 +1,4 @@
-use crate::render::{Vertex, pipelines::BindGroupKind};
+use crate::render::Vertex;
 use super::{
     BindGroupLayouts, BindGroupLayoutMap,
     bind_group_map,

@@ -1,10 +1,9 @@
 use super::{
-    Model,
     Shaders,
-    pipelines::{Pipelines, MeshDebugPipeline, BindGroupLayouts}, Mesh,
+    pipelines::{Pipelines, MeshDebugPipeline, BindGroupLayouts},
+    Mesh,
 };
 
-use wgpu::util::DeviceExt;
 
 pub struct Renderer {
     pub device: wgpu::Device,

@@ -1,10 +1,6 @@
-use uid::*;
-
 use crate::{
     atom::AtomObject,
-    render::{
-        Mesh, Model,
-    },
+    render::Model,
 };
 
 #[derive(Clone)]
