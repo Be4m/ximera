@@ -77,10 +77,9 @@ impl Renderer {
         let pipelines = Pipelines {
             mesh_debug: MeshDebugPipeline::new(
                 &device,
-                &shaders.model,
-                &shaders.model,
+                &shaders.dummy,
+                &shaders.dummy,
                 surface_format,
-                &bind_group_layouts,
             ),
         };
         
@@ -97,7 +96,7 @@ impl Renderer {
         }
     }
 
-    pub fn render_mesh(&self, mesh: Mesh) -> Result<(), wgpu::SurfaceError> {
+    pub fn render_mesh(&self, mesh: &Mesh) -> Result<(), wgpu::SurfaceError> {
         let output = self.surface.get_current_texture()?;
         let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
@@ -108,7 +107,22 @@ impl Renderer {
         {
             let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: None,
-                color_attachments: &[],
+                color_attachments: &[
+                    Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color {
+                                    r: 1.0,
+                                    b: 0.0,
+                                    g: 0.0,
+                                    a: 1.0,
+                                }
+                            ),
+                            store: true,
+                        }
+                    })
+                ],
                 depth_stencil_attachment: None,
             });
 

@@ -1,12 +1,20 @@
 use crate::render::Vertex;
 
-use super::BindGroupLayouts;
+use super::{
+    BindGroupLayouts, BindGroupLayoutMap,
+    BindGroupKind,
+    bind_group_map,
+};
 
 pub struct ModelPipeline {
     pub render_pipeline: wgpu::RenderPipeline,
 }
 
 impl ModelPipeline {
+    pub const BIND_GROUP_MAP: BindGroupLayoutMap = bind_group_map!(
+        BindGroupLayouts::NUM_LAYOUTS,
+        BindGroupKind::Model
+    );
 
     pub fn new(
         device: &wgpu::Device,
@@ -17,7 +25,7 @@ impl ModelPipeline {
         let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Mesh Debug pipeline layout"),
             bind_group_layouts: &[
-                &bind_group_layouts.model
+                &bind_group_layouts.model,
             ],
             push_constant_ranges: &[],
         });
@@ -27,7 +35,7 @@ impl ModelPipeline {
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: shader_module,
-                entry_point: "vs_main",
+                entry_point: "vertex_main",
                 buffers: &[Vertex::buffer_layout()],
             },
             primitive: wgpu::PrimitiveState {
@@ -47,7 +55,7 @@ impl ModelPipeline {
             },
             fragment: Some(wgpu::FragmentState {
                 module: shader_module,
-                entry_point: "fs_main",
+                entry_point: "fragment_main",
                 targets: &[Some(wgpu::ColorTargetState {
                     format: target_format,
                     blend: Some(wgpu::BlendState::REPLACE),

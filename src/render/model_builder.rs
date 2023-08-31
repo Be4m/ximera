@@ -3,8 +3,7 @@ use nalgebra::{
 };
 
 use super::{
-    Vertex,
-    mesh::Model,
+    Vertex, Model,
     pipelines::PipelineKind,
 };
 
@@ -83,7 +82,7 @@ impl ModelBuilder {
         let num_indices = index_data.len() as u32;
 
         Model {
-            transform: Transform3::<f32>::identity(),
+            transform: Transform3::identity(),
             vertex_data,
             index_data,
             num_vertices,
@@ -135,6 +134,21 @@ impl ModelBuilder {
             let i0 = offset + i0;
             let i1 = offset + i1;
             model_builder.index_triangle([i0, i1, ibottom]);
+        }
+
+        // Add quads
+        for stack in 0..(num_stacks - 2) {
+            let upper_row = stack * num_slices + 1;
+            let lower_row = upper_row + num_slices;
+
+            for slice in 0..num_slices {
+                let i0 = upper_row + slice;
+                let i1 = upper_row + (slice + 1) % num_slices;
+                let i2 = lower_row + (slice + 1) % num_slices;
+                let i3 = lower_row + slice;
+
+                model_builder.index_quad([i0, i1, i2, i3]);
+            }
         }
 
         return model_builder;

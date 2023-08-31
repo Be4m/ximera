@@ -11,7 +11,6 @@ pub struct MeshDebugPipeline {
 impl MeshDebugPipeline {
     pub const BIND_GROUP_MAP: BindGroupLayoutMap = bind_group_map!(
         BindGroupLayouts::NUM_LAYOUTS,
-        BindGroupKind::Model
     );
 
     pub fn new(
@@ -19,7 +18,6 @@ impl MeshDebugPipeline {
         vs_module: &wgpu::ShaderModule,
         fs_module: &wgpu::ShaderModule,
         target_format: wgpu::TextureFormat,
-        bind_group_layouts: &BindGroupLayouts,
     ) -> Self {
 
         // Make sure that "Wireframe" rendering is enabled for debug pipeline
@@ -27,9 +25,7 @@ impl MeshDebugPipeline {
 
         let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Mesh Debug pipeline layout"),
-            bind_group_layouts: &[
-                &bind_group_layouts.model,
-            ],
+            bind_group_layouts: &[],
             push_constant_ranges: &[],
         });
 
@@ -38,7 +34,7 @@ impl MeshDebugPipeline {
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
                 module: vs_module,
-                entry_point: "vs_main",
+                entry_point: "vertex_main",
                 buffers: &[Vertex::buffer_layout()],
             },
             primitive: wgpu::PrimitiveState {
@@ -58,7 +54,7 @@ impl MeshDebugPipeline {
             },
             fragment: Some(wgpu::FragmentState {
                 module: fs_module,
-                entry_point: "fs_main",
+                entry_point: "fragment_main",
                 targets: &[Some(wgpu::ColorTargetState {
                     format: target_format,
                     blend: Some(wgpu::BlendState::REPLACE),

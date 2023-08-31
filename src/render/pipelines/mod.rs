@@ -41,9 +41,20 @@ impl PipelineKind {
         }
     }
 
+    // TODO: Since we're using match anyway, This should done even less abstract.
     pub fn used_bind_groups(&self) -> Vec<BindGroupKind> {
         match self {
             PipelineKind::Model => {
+                ModelPipeline::BIND_GROUP_MAP
+                    .into_iter()
+                    .enumerate()
+                    .filter(|(_, b)| *b)
+                    .map(|(i, _)| {
+                        <usize as TryInto<BindGroupKind>>::try_into(i).unwrap()
+                    })
+                    .collect::<Vec<_>>()
+            },
+            PipelineKind::MeshDebug => {
                 MeshDebugPipeline::BIND_GROUP_MAP
                     .into_iter()
                     .enumerate()

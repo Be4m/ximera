@@ -61,7 +61,7 @@ impl App {
 
     pub fn init(&mut self) {
 
-        self.scene.init();
+        // self.scene.init();
 
         self.is_initialised = true;
     }
@@ -117,6 +117,19 @@ impl App {
                 },
 
                 Event::RedrawRequested(window_id) if self.window.id() == window_id => {
+                    use crate::render::model_builder::ModelBuilder;
+                    use crate::render::pipelines::PipelineKind;
+
+                    let sphere_model = ModelBuilder::build_uv_sphere(1.0, 8, 8)
+                        .set_pipeline(PipelineKind::MeshDebug)
+                        .build();
+
+                    let sphere_mesh = sphere_model.create_mesh(
+                        &self.renderer.device,
+                        &self.renderer.bind_group_layouts,
+                    );
+
+                    self.renderer.render_mesh(&sphere_mesh).unwrap();
                 },
 
                 Event::MainEventsCleared => self.window.request_redraw(),

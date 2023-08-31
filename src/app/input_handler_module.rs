@@ -25,7 +25,7 @@ pub enum InputHandlerModuleKind {
 impl InputHandlerModuleKind {
     pub fn handle_input(&mut self, input: Input) {
         match self {
-            InputHandlerModuleKind::CameraControllerIHM(camera_controller) => todo!(),
+            InputHandlerModuleKind::CameraControllerIHM(camera_controller) => {},
         }
     }
 }
