@@ -1,4 +1,10 @@
-//use super::{mesh::Mesh, pipelines::MeshDebugPipeline};
+use super::{
+    Model,
+    Shaders,
+    pipelines::{Pipelines, MeshDebugPipeline, BindGroupLayouts}, Mesh,
+};
+
+use wgpu::util::DeviceExt;
 
 pub struct Renderer {
     pub device: wgpu::Device,
@@ -8,10 +14,8 @@ pub struct Renderer {
     pub surface_format: wgpu::TextureFormat,
     pub resolution: winit::dpi::PhysicalSize<u32>,
 
-
-    //render_pipeline: wgpu::RenderPipeline,
-
-    //camera: Camera,
+    pub pipelines: Pipelines,
+    pub bind_group_layouts: BindGroupLayouts,
 }
 
 impl Renderer {
@@ -67,21 +71,19 @@ impl Renderer {
         };
         surface.configure(&device, &surface_config);
 
-        // TODO: Temporary
-        // let shader_mod = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-        //     label: None,
-        //     source: wgpu::ShaderSource::Wgsl(include_str!("default.wgsl").into()),
-        // });
+        let shaders = Shaders::create(&device);
+        let bind_group_layouts = BindGroupLayouts::create(&device);
 
-        // let pipelines = {
-        //     let mesh_debug = MeshDebugPipeline::new(
-        //         &device,
-        //         &shader_mod,
-        //         &shader_mod,
-        //         surface_format,
-        //     );
-        // };
-
+        let pipelines = Pipelines {
+            mesh_debug: MeshDebugPipeline::new(
+                &device,
+                &shaders.model,
+                &shaders.model,
+                surface_format,
+                &bind_group_layouts,
+            ),
+        };
+        
         Self {
             device,
             queue,
@@ -89,50 +91,44 @@ impl Renderer {
             surface,
             surface_format,
             resolution: size,
+
+            pipelines,
+            bind_group_layouts,
         }
     }
 
-    // pub fn render<T: Renderable>(
-    //     &self,
-    //     renderable: &T,
-    //     pipeline: super::Pipeline,
-    // ) -> Result<(), wgpu::SurfaceError> {
-    //     let output = self.surface.get_current_texture()?;
-    //     let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+    pub fn render_mesh(&self, mesh: Mesh) -> Result<(), wgpu::SurfaceError> {
+        let output = self.surface.get_current_texture()?;
+        let view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-    //     let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
+        let pipeline = mesh.pipeline.get_pipeline(&self.pipelines);
 
-    //     {
-    //         // TODO: color_attachments should be dictated by the active scene.
-    //         // IDEA: Maybe Renderable should be substituted for something like SceneObject
-    //         // which would contain a reference to the relevant scene that holds variables like bg_colour and so on.
-    //         let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-    //             label: None,
-    //             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-    //                 view: &view,
-    //                 resolve_target: None,
-    //                 ops: wgpu::Operations {
-    //                     load: wgpu::LoadOp::Clear(wgpu::Color {
-    //                         r: 1.0,
-    //                         g: 0.0,
-    //                         b: 0.0,
-    //                         a: 1.0,
-    //                     }),
-    //                     store: true,
-    //                 }
-    //             })],
-    //             depth_stencil_attachment: None,
-    //         });
+        let mut encoder = self.device.create_command_encoder(&wgpu::CommandEncoderDescriptor::default());
 
-    //         render_pass.set_pipeline(pipeline.pipeline());
-    //         render_pass.set_vertex_buffer(0, renderable.vertex_buffer().slice(..));
+        {
+            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                label: None,
+                color_attachments: &[],
+                depth_stencil_attachment: None,
+            });
 
-    //         render_pass.draw(0..renderable.num_vertices(), 0..1);
-    //     }
+            render_pass.set_pipeline(pipeline.render_pipeline());
+            mesh.bind_groups
+                .iter()
+                .enumerate()
+                .for_each(|(i, bgroup)| {
+                    render_pass.set_bind_group(i.try_into().unwrap(), bgroup, &[]);
+                });
 
-    //     self.queue.submit(std::iter::once(encoder.finish()));
-    //     output.present();
+            render_pass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+            render_pass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
 
-    //     Ok(())
-    // }
+            render_pass.draw_indexed(0..mesh.num_indices, 0, 0..1);
+        }
+
+        self.queue.submit(std::iter::once(encoder.finish()));
+        output.present();
+
+        Ok(())
+    }
 }

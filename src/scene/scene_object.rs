@@ -1,3 +1,5 @@
+use uid::*;
+
 use crate::{
     atom::AtomObject,
     render::{
@@ -5,33 +7,38 @@ use crate::{
     },
 };
 
+#[derive(Clone)]
 pub struct SceneObject {
     pub position: nalgebra::Vector3<f32>,
-    pub kind: SceneObjectKind,
-
-    pub mesh: Mesh,
+    pub model: Model,
 }
 
 impl SceneObject {
     pub fn new(
         position: nalgebra::Vector3<f32>,
-        kind: SceneObjectKind,
-        mesh: Mesh,
+        model: Model,
     ) -> Self {
         Self {
             position,
-            kind,
-
-            mesh,
+            model,
         }
     }
 }
 
+#[derive(Clone)]
 pub enum SceneObjectKind {
     Atom(AtomObject),    
 }
 
 impl SceneObjectKind {
+    pub fn model(&self) -> &Model {
+        match self {
+            SceneObjectKind::Atom(atom_obj) => {
+                &atom_obj.model
+            }
+        }
+    }
+
     pub fn model_mut(&mut self) -> &mut Model {
         match self {
             SceneObjectKind::Atom(atom_obj) => {

@@ -1,6 +1,4 @@
-use crate::render::camera::{
-    Camera, CameraController,
-};
+use crate::render::camera::CameraController;
 
 use super::Input;
 

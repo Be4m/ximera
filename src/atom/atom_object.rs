@@ -2,8 +2,10 @@ use crate::render::Model;
 
 use super::Atom;
 
+#[derive(Clone)]
 pub struct AtomObject {
     pub atom: Atom,
+
     pub model: Model,
 }
 

@@ -1,24 +1,20 @@
-use nalgebra::Point3;
+use nalgebra::{
+    Point3, Transform3,
+};
 
-use super::mesh::Model;
+use super::{
+    Vertex,
+    mesh::Model,
+    pipelines::PipelineKind,
+};
 
-/// This struct's made easy to generate meshes.
-/// 
-/// It takes away the worry of vertex and index buffers and allows the caller
-/// to generate meshes by calling convenient methods, such as: add_triangles or add_quads.
-/// 
-/// MeshBuilder should not be used for "on the fly" contexts, meaning that all the MeshBuilder
-/// instances should be built before the program starts running. That's because the build method
-/// is not meant to be fast but rather safe and correct, preventing the caller from making wrong
-/// geometry.
-/// 
-/// TOOD: For use cases where generating geometry on-the-fly is necessary, we should implement a new
-/// struct solely for this purpose: DynamicMeshBuilder, or something similar.
 pub struct ModelBuilder {
     points: Vec<Point3<f32>>,
 
-    triangles: Vec<IndexTriangle>,
-    quads: Vec<IndexQuad>,
+    triangles: Vec<[i16; 3]>,
+    quads: Vec<[i16; 4]>,
+
+    special_pipeline: Option<PipelineKind>,
 }
 
 impl ModelBuilder {
@@ -30,6 +26,8 @@ impl ModelBuilder {
 
             triangles: vec![],
             quads: vec![],
+
+            special_pipeline: None,
         }
     }
 
@@ -37,12 +35,32 @@ impl ModelBuilder {
         self.points.push(position);
     }
 
-    pub fn index_triangle(&mut self, triangle: IndexTriangle) {
+    pub fn index_triangle(&mut self, triangle: [i16; 3]) {
         self.triangles.push(triangle);
     }
 
-    pub fn index_quad(&mut self, quad: IndexQuad) {
+    pub fn index_quad(&mut self, quad: [i16; 4]) {
         self.quads.push(quad);
+    }
+
+    fn triangulate_quad(quad: [i16; 4]) -> [[i16; 3]; 2] {
+        let tri0 = [
+            quad[0],
+            quad[1],
+            quad[2],
+        ];
+        let tri1 = [
+            quad[2],
+            quad[3],
+            quad[0],
+        ];
+
+        return [tri0, tri1];
+    }
+
+    pub fn set_pipeline(mut self, pipeline: PipelineKind) -> Self {
+        self.special_pipeline = Some(pipeline);
+        return self;
     }
 
     pub fn build(self) -> Model {
@@ -51,88 +69,74 @@ impl ModelBuilder {
                 .flatten()
                 .collect::<Vec<_>>(),
             self.quads.into_iter()
-                .flat_map(|qd| qd.triangulate())
+                .flat_map(Self::triangulate_quad)
                 .flatten()
                 .collect::<Vec<_>>()
         ].concat();
+        
+        let vertex_data = self.points
+            .into_iter()
+            .map(From::from)
+            .collect::<Vec<Vertex>>();
 
-        todo!();
+        let num_vertices = vertex_data.len() as u32;
+        let num_indices = index_data.len() as u32;
+
+        Model {
+            transform: Transform3::<f32>::identity(),
+            vertex_data,
+            index_data,
+            num_vertices,
+            num_indices,
+            pipeline_kind: self.special_pipeline.unwrap_or(PipelineKind::Model),
+        }
     }
 
     pub fn build_uv_sphere(
         radius: f32,
-        num_slices: u32,
-        num_stacks: u32,
-    ) -> Self { todo!() }
-}
+        num_slices: i16,
+        num_stacks: i16,
+    ) -> Self {
+        let mut model_builder = ModelBuilder::new();
 
-#[derive(Clone, Copy)]
-pub struct IndexTriangle {
-    a: i16,
-    b: i16,
-    c: i16,
-}
+        // Add top point
+        model_builder.add_point(Point3::new(0.0, radius, 0.0));
 
-#[derive(Clone, Copy)]
-pub struct IndexQuad {
-    a: i16,
-    b: i16,
-    c: i16,
-    d: i16,
-}
+        // Generate points for each slice in each stack
+        for stack in 0..(num_stacks - 1) {
+            let phi = std::f32::consts::PI / (num_stacks as f32) * (stack as f32 + 1.0);
 
-impl IndexQuad {
+            for slice in 0..num_slices {
+                let theta = std::f32::consts::TAU / (num_slices as f32) * (slice as f32);
 
-    // TODO: This relies on the premise that the quad's vertices are gonna be
-    // filled in correctly, that means in clock-wise order.
-    // If we're trying to be pedantic here, checks should be when creating a new Quad.
-    pub fn triangulate(self) -> [IndexTriangle; 2] {
+                // Convert to cartesian coordinate system
+                let x = phi.sin() * theta.cos() * radius;
+                let y = phi.cos() * radius;
+                let z = phi.sin() * theta.sin() * radius;
 
-        let tri1 = IndexTriangle {
-            a: self.a,
-            b: self.b,
-            c: self.c,
-        };
-
-        let tri2 = IndexTriangle {
-            a: self.c,
-            b: self.d,
-            c: self.a,
-        };
-
-        return [tri1, tri2];
-    }
-}
-
-pub struct IndexTriangleIntoIter {
-    triangle: IndexTriangle,
-    index: usize,
-}
-
-impl Iterator for IndexTriangleIntoIter {
-    type Item = i16;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let result = match self.index {
-            0 => self.triangle.a,
-            1 => self.triangle.b,
-            2 => self.triangle.c,
-            _ => return None,
-        };
-
-        self.index += 1;
-        Some(result)
-    }
-}
-
-impl IntoIterator for IndexTriangle {
-    type Item = i16;
-    type IntoIter = IndexTriangleIntoIter;
-
-    fn into_iter(self) -> Self::IntoIter {
-        IndexTriangleIntoIter {
-            triangle: self,
-            index: 0,
+                model_builder.add_point(Point3::new(x, y, z));
+            }
         }
+
+        // Add bottom point
+        model_builder.add_point(Point3::new(0.0, -radius, 0.0));
+
+        // Add top & bottom triangles
+        let itop = 0;
+        let ibottom = (num_stacks - 1) * num_slices + 1;
+
+        for slice in 0..num_slices {
+            // We're adding 1 at the end of each index to offset the top point.
+            let i0 = slice + 1;
+            let i1 = (slice + 1) % num_slices + 1;
+            model_builder.index_triangle([i0, i1, itop]);
+
+            let offset = (num_stacks - 2) * num_slices;
+            let i0 = offset + i0;
+            let i1 = offset + i1;
+            model_builder.index_triangle([i0, i1, ibottom]);
+        }
+
+        return model_builder;
     }
 }

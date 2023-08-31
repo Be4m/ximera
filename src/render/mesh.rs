@@ -1,3 +1,9 @@
+use wgpu::util::DeviceExt;
+
+use crate::render::pipelines::BindGroupKind;
+
+use super::pipelines::{Pipeline, PipelineKind, Pipelines, BindGroupLayouts};
+
 // I don't think we're going to need more than one vertex for this program as of now.
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
@@ -21,6 +27,19 @@ impl Vertex {
     }
 }
 
+impl From<nalgebra::Point3<f32>> for Vertex {
+    fn from(value: nalgebra::Point3<f32>) -> Self {
+        Self {
+            position: [
+                value.x,
+                value.y,
+                value.z,
+            ],
+        }   
+    }
+}
+
+#[derive(Clone)]
 pub struct Model {
     pub transform: nalgebra::Transform3<f32>,
     
@@ -29,18 +48,72 @@ pub struct Model {
     
     pub num_vertices: u32,
     pub num_indices: u32,
+
+    pub pipeline_kind: PipelineKind,
 }
 
-pub struct MeshData {
+impl Model {
+    pub fn create_mesh(
+        &self,
+        device: &wgpu::Device,
+        bind_group_layouts: &BindGroupLayouts,
+    ) -> Mesh {
+        let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(self.vertex_data.as_slice()),
+            usage: wgpu::BufferUsages::VERTEX,
+        });
+        let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: bytemuck::cast_slice(self.index_data.as_slice()),
+            usage: wgpu::BufferUsages::INDEX,
+        });
+
+        let model_mat = bytemuck::cast(*self.transform.matrix());
+        let model_mat_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: &[model_mat],
+            usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        });
+
+        let bind_groups = self.pipeline_kind.used_bind_groups()
+            .into_iter()
+            .map(|kind| {
+                match kind {
+                    BindGroupKind::Model => {
+                        device.create_bind_group(&wgpu::BindGroupDescriptor {
+                            label: None,
+                            layout: &bind_group_layouts.model,
+                            entries: &[
+                                wgpu::BindGroupEntry {
+                                    binding: 0,
+                                    resource: model_mat_buffer.as_entire_binding(),
+                                }
+                            ]
+                        })
+                    }
+                }
+            })
+            .collect::<Vec<_>>();
+
+        Mesh {
+            vertex_buffer,
+            index_buffer,
+            num_vertices: self.num_vertices.clone(),
+            num_indices: self.num_indices.clone(),
+
+            pipeline: self.pipeline_kind,
+            bind_groups,
+        }
+    }
+}
+
+pub struct Mesh {
     pub vertex_buffer: wgpu::Buffer,
     pub index_buffer: wgpu::Buffer,
     pub num_vertices: u32,
     pub num_indices: u32,
 
-    pub model_mat: [[f32; 4]; 4],
-}
-
-pub enum Mesh {
-    Created(MeshData),
-    Loaded(MeshData)
+    pub pipeline: PipelineKind,
+    pub bind_groups: Vec<wgpu::BindGroup>,
 }

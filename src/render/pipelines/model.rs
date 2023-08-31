@@ -1,34 +1,23 @@
-use crate::render::{Vertex, pipelines::BindGroupKind};
-use super::{
-    BindGroupLayouts, BindGroupLayoutMap,
-    bind_group_map,
-};
+use crate::render::Vertex;
 
-pub struct MeshDebugPipeline {
+use super::BindGroupLayouts;
+
+pub struct ModelPipeline {
     pub render_pipeline: wgpu::RenderPipeline,
 }
 
-impl MeshDebugPipeline {
-    pub const BIND_GROUP_MAP: BindGroupLayoutMap = bind_group_map!(
-        BindGroupLayouts::NUM_LAYOUTS,
-        BindGroupKind::Model
-    );
+impl ModelPipeline {
 
     pub fn new(
         device: &wgpu::Device,
-        vs_module: &wgpu::ShaderModule,
-        fs_module: &wgpu::ShaderModule,
+        shader_module: &wgpu::ShaderModule,
         target_format: wgpu::TextureFormat,
         bind_group_layouts: &BindGroupLayouts,
     ) -> Self {
-
-        // Make sure that "Wireframe" rendering is enabled for debug pipeline
-        assert!(device.features().contains(wgpu::Features::POLYGON_MODE_LINE));
-
         let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Mesh Debug pipeline layout"),
             bind_group_layouts: &[
-                &bind_group_layouts.model,
+                &bind_group_layouts.model
             ],
             push_constant_ranges: &[],
         });
@@ -37,7 +26,7 @@ impl MeshDebugPipeline {
             label: Some("Mesh Debug pipeline"),
             layout: Some(&render_pipeline_layout),
             vertex: wgpu::VertexState {
-                module: vs_module,
+                module: shader_module,
                 entry_point: "vs_main",
                 buffers: &[Vertex::buffer_layout()],
             },
@@ -47,7 +36,7 @@ impl MeshDebugPipeline {
                 front_face: wgpu::FrontFace::Ccw,
                 cull_mode: None,
                 unclipped_depth: false,
-                polygon_mode: wgpu::PolygonMode::Line,
+                polygon_mode: wgpu::PolygonMode::Fill,
                 conservative: false,
             },
             depth_stencil: None,
@@ -57,7 +46,7 @@ impl MeshDebugPipeline {
                 alpha_to_coverage_enabled: false,
             },
             fragment: Some(wgpu::FragmentState {
-                module: fs_module,
+                module: shader_module,
                 entry_point: "fs_main",
                 targets: &[Some(wgpu::ColorTargetState {
                     format: target_format,

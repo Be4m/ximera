@@ -34,7 +34,7 @@ impl App {
 
     pub fn new(window: Window, event_loop: EventLoop, renderer: Renderer) -> Self {
 
-        let scene = Scene::new(renderer.resolution);
+        let scene = Scene::new(renderer.resolution, wgpu::Color::RED);
 
         let camera_controller = CameraController {};
 
@@ -66,7 +66,7 @@ impl App {
         self.is_initialised = true;
     }
 
-    pub fn run(mut self) {
+    pub fn run(self) {
         // Make sure the application is initialised before running it.
         assert!(self.is_initialised);
 
